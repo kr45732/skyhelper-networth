@@ -22,9 +22,7 @@ import skyhelper.networth.helper.NetworthItems;
 public class SkyHelperNetworth {
 
 	private final HttpClient httpClient;
-
 	public final JsonArray skyblockItems;
-
 	public Map<String, Double> prices = new HashMap<>();
 
 	public SkyHelperNetworth() throws IOException {

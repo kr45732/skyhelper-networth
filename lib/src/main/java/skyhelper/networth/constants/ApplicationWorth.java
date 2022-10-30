@@ -35,7 +35,6 @@ public class ApplicationWorth {
 			put("petCandy", 0.65);
 		}
 	};
-
 	public static Map<String, Double> enchantsWorth = Map.of(
 		"overload",
 		0.35,

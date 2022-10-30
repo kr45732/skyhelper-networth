@@ -31,7 +31,6 @@ public class NetworthItems {
 		"personal_vault",
 		"personal_vault_contents"
 	);
-
 	private final Map<String, List<Object>> items = new HashMap<>();
 
 	public NetworthItems(JsonObject profileData) throws NetworthException {
