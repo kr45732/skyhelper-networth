@@ -14,6 +14,7 @@ import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import me.nullicorn.nedit.type.NBTCompound;
 import skyhelper.networth.helper.NetworthData;
 import skyhelper.networth.helper.NetworthException;
 import skyhelper.networth.helper.NetworthItems;
@@ -39,6 +40,14 @@ public class SkyHelperNetworth {
 		this.prices = parsePrices(prices);
 		NetworthItems items = new NetworthItems(profileData);
 		return NetworthData.calculateNetworth(items, purse, bankBalance, this, onlyNetworth);
+	}
+
+	public NetworthData.BaseItemData getItemNetworth(Object item, Map<String, Double> prices) throws NetworthException {
+		if (!((item instanceof NBTCompound nbt && nbt.containsKey("tag")) || (item instanceof JsonObject petJson && petJson.has("exp")))) {
+			throw new NetworthException("Invalid item provided");
+		}
+		this.prices = parsePrices(prices);
+		return NetworthData.calculateItemNetworth(item, this);
 	}
 
 	private Map<String, Double> parsePrices(Map<String, Double> prices) throws NetworthException {

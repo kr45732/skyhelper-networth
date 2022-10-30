@@ -1,6 +1,7 @@
 package skyhelper.networth.helper;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import skyhelper.networth.SkyHelperNetworth;
 import skyhelper.networth.calculator.ItemCalculator;
 import skyhelper.networth.calculator.PetCalculator;
 import skyhelper.networth.calculator.SacksCalculator;
+import skyhelper.networth.constants.Pets;
 
 public record NetworthData(
 	boolean noInventory,
@@ -76,6 +78,17 @@ public record NetworthData(
 			bankBalance,
 			categories
 		);
+	}
+
+	public static BaseItemData calculateItemNetworth(Object item, SkyHelperNetworth skyHelperNetworth) {
+		boolean isPet = item instanceof JsonObject || ((NBTCompound) item).containsKey("tag.ExtraAttributes.petInfo");
+		if (isPet) {
+			JsonObject petInfo = item instanceof JsonObject petObj
+				? petObj
+				: JsonParser.parseString(((NBTCompound) item).getString("tag.ExtraAttributes.petInfo")).getAsJsonObject();
+			return PetCalculator.calculatePet(Pets.getPetLevel(petInfo), skyHelperNetworth);
+		}
+		return ItemCalculator.calculateItem((NBTCompound) item, skyHelperNetworth);
 	}
 
 	public record CategoryData(double total, double unsoulboundTotal, List<BaseItemData> items) {}
