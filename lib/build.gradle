@@ -1,0 +1,16 @@
+plugins {
+    id 'java-library'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JSON
+    implementation 'com.google.code.gson:gson:2.10'
+    // Http
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    // NBT
+    implementation 'me.nullicorn:Nedit:2.2.0'
+}

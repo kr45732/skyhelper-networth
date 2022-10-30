@@ -1,0 +1,2 @@
+rootProject.name = 'skyhelper-networth'
+include('lib')
