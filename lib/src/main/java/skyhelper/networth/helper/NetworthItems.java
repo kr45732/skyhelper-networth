@@ -34,16 +34,15 @@ public class NetworthItems {
 
 	private final Map<String, List<Object>> items = new HashMap<>();
 
-	public NetworthItems(ProfileData profileData) throws NetworthException {
+	public NetworthItems(JsonObject profileData) throws NetworthException {
 		// Parse Sacks
 		items.put("sacks", new ArrayList<>());
-		if (profileData.hasElement("sacks_counts")) {
+		if (profileData.has("sacks_counts")) {
 			items
 				.get("sacks")
 				.addAll(
 					profileData
-						.getElement("sacks_counts")
-						.getAsJsonObject()
+						.getAsJsonObject("sacks_counts")
 						.entrySet()
 						.stream()
 						.map(e -> {
@@ -58,39 +57,31 @@ public class NetworthItems {
 
 		for (Map.Entry<String, String> category : singleContainers.entrySet()) {
 			items.put(category.getKey(), new ArrayList<>());
-			if (profileData.hasElement(category.getValue())) {
-				items.get(category.getKey()).addAll(parseContainer(profileData.getElement(category.getValue()).getAsString()));
+			if (profileData.has(category.getValue())) {
+				items.get(category.getKey()).addAll(parseContainer(profileData.get(category.getValue()).getAsString()));
 			}
 		}
 
 		// Parse Storage
 		items.put("storage", new ArrayList<>());
-		if (profileData.hasElement("backpack_contents") && profileData.hasElement("backpack_icons")) {
+		if (profileData.has("backpack_contents") && profileData.has("backpack_icons")) {
 			// Parse Storage Contents
-			for (JsonElement backpackContent : profileData.getElement("backpack_contents").getAsJsonArray()) {
+			for (JsonElement backpackContent : profileData.getAsJsonArray("backpack_contents")) {
 				items.get("storage").addAll(parseContainer(backpackContent.getAsJsonObject().get("data").getAsString()));
 			}
 
 			// Parse Storage Backpacks
-			for (JsonElement backpack : profileData.getElement("backpack_icons").getAsJsonArray()) {
+			for (JsonElement backpack : profileData.getAsJsonArray("backpack_icons")) {
 				items.get("storage").addAll(parseContainer(backpack.getAsJsonObject().get("data").getAsString()));
 			}
 		}
 
 		// Parse pets
 		items.put("pets", new ArrayList<>());
-		if (profileData.hasElement("pets")) {
+		if (profileData.has("pets")) {
 			items
 				.get("pets")
-				.addAll(
-					profileData
-						.getElement("pets")
-						.getAsJsonArray()
-						.asList()
-						.stream()
-						.map(p -> Pets.getPetLevel(p.getAsJsonObject()))
-						.toList()
-				);
+				.addAll(profileData.getAsJsonArray("pets").asList().stream().map(p -> Pets.getPetLevel(p.getAsJsonObject())).toList());
 		}
 	}
 

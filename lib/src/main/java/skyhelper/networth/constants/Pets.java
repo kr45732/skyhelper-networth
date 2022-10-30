@@ -6,8 +6,21 @@ import java.util.Map;
 
 public class Pets {
 
+	public static final List<String> blockedCandyReducePets = List.of("ENDER_DRAGON", "GOLDEN_DRAGON", "SCATHA");
+	public static final List<String> recombPetItems = List.of("PET_ITEM_TIER_BOOST", "PET_ITEM_VAMPIRE_FANG", "PET_ITEM_TOY_JERRY");
+	public static final List<String> soulboundPets = List.of("GRANDMA_WOLF", "KUUDRA", "BINGO");
+	public static final List<String> tiers = List.of(
+		"COMMON",
+		"UNCOMMON",
+		"RARE",
+		"EPIC",
+		"LEGENDARY",
+		"MYTHIC",
+		"DIVINE",
+		"SPECIAL",
+		"VERY_SPECIAL"
+	);
 	private static final Map<String, Integer> specialLevels = Map.of("GOLDEN_DRAGON", 200);
-
 	private static final Map<String, Integer> rarityOffset = Map.of(
 		"COMMON",
 		0,
@@ -22,7 +35,6 @@ public class Pets {
 		"MYTHIC",
 		20
 	);
-
 	private static final List<Integer> levels = List.of(
 		100,
 		110,
@@ -244,21 +256,6 @@ public class Pets {
 		1886700,
 		1886700
 	);
-
-	private static final String[] blockedCandyReducePets = { "ENDER_DRAGON", "GOLDEN_DRAGON", "SCATHA" };
-	private static final String[] recombPetItems = { "PET_ITEM_TIER_BOOST", "PET_ITEM_VAMPIRE_FANG", "PET_ITEM_TOY_JERRY" };
-	private static final String[] soulboundPets = { "GRANDMA_WOLF", "KUUDRA", "BINGO" };
-	private static final String[] tiers = {
-		"COMMON",
-		"UNCOMMON",
-		"RARE",
-		"EPIC",
-		"LEGENDARY",
-		"MYTHIC",
-		"DIVINE",
-		"SPECIAL",
-		"VERY_SPECIAL",
-	};
 
 	public static JsonObject getPetLevel(JsonObject pet) {
 		String petType = pet.get("type").getAsString();
