@@ -9,7 +9,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import skyhelper.networth.helper.Networth;
+import skyhelper.networth.helper.NetworthData;
 import skyhelper.networth.helper.NetworthException;
 import skyhelper.networth.helper.NetworthItems;
 import skyhelper.networth.helper.ProfileData;
@@ -22,12 +22,12 @@ public class SkyHelperNetworth {
 		this.httpClient = HttpClientBuilder.create().build();
 	}
 
-	public Networth getNetworth(ProfileData profileData, double bankBalance, boolean onlyNetworth, Map<String, Double> prices)
+	public NetworthData getNetworth(ProfileData profileData, double bankBalance, boolean onlyNetworth, Map<String, Double> prices)
 		throws NetworthException {
 		double purse = profileData.getElement("coin_purse").getAsDouble();
 		prices = parsePrices(prices);
 		NetworthItems items = new NetworthItems(profileData);
-		return Networth.calculateNetworth(items, purse, bankBalance, prices, onlyNetworth);
+		return NetworthData.calculateNetworth(items, purse, bankBalance, prices, onlyNetworth);
 	}
 
 	public Map<String, Double> parsePrices(Map<String, Double> prices) throws NetworthException {
