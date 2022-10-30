@@ -1,37 +1,35 @@
 package skyhelper.networth;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.Getter;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import skyhelper.networth.helper.NetworthData;
 import skyhelper.networth.helper.NetworthException;
 import skyhelper.networth.helper.NetworthItems;
 
 public class SkyHelperNetworth {
 
-	private final CloseableHttpClient httpClient;
+	private final HttpClient httpClient;
 
-	@Getter
-	private final JsonObject skyblockItems;
+	public final JsonArray skyblockItems;
 
-	@Getter
-	private Map<String, Double> prices = new HashMap<>();
+	public Map<String, Double> prices = new HashMap<>();
 
 	public SkyHelperNetworth() throws IOException {
-		this.httpClient = HttpClientBuilder.create().build();
+		this.httpClient = HttpClient.newHttpClient();
 		try (FileReader reader = new FileReader("lib/src/main/java/skyhelper/networth/calculator/SacksCalculator.java")) {
-			this.skyblockItems = JsonParser.parseReader(reader).getAsJsonObject();
+			this.skyblockItems = JsonParser.parseReader(reader).getAsJsonArray();
 		}
 	}
 
@@ -50,7 +48,7 @@ public class SkyHelperNetworth {
 					prices = prices.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().toLowerCase(), Map.Entry::getValue));
 				}
 			} else {
-				prices = loadPrices();
+				prices = getPrices();
 			}
 			return prices;
 		} catch (Exception e) {
@@ -58,18 +56,16 @@ public class SkyHelperNetworth {
 		}
 	}
 
-	private Map<String, Double> loadPrices() throws NetworthException {
+	private Map<String, Double> getPrices() throws NetworthException {
 		try {
-			HttpGet httpGet = new HttpGet("https://raw.githubusercontent.com/SkyHelperBot/Prices/main/prices.json");
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-
-			try (
-				CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
-				InputStreamReader in = new InputStreamReader(httpResponse.getEntity().getContent());
-				JsonReader jsonIn = new JsonReader(in)
-			) {
+			HttpRequest httpRequest = HttpRequest
+				.newBuilder(URI.create("https://raw.githubusercontent.com/SkyHelperBot/Prices/main/prices.json"))
+				.GET()
+				.build();
+			HttpResponse<InputStream> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+			try (InputStream in = httpResponse.body(); InputStreamReader reader = new InputStreamReader(in)) {
 				return JsonParser
-					.parseReader(jsonIn)
+					.parseReader(reader)
 					.getAsJsonObject()
 					.entrySet()
 					.stream()

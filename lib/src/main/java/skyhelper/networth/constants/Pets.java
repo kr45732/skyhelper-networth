@@ -258,12 +258,9 @@ public class Pets {
 	);
 
 	public static JsonObject getPetLevel(JsonObject pet) {
-		String petType = pet.get("type").getAsString();
-		String petTier = pet.get("tier").getAsString();
 		long petExp = pet.get("exp").getAsLong();
-
-		int maxPetLevel = specialLevels.getOrDefault(petType, 100);
-		int petOffset = rarityOffset.get(petTier);
+		int maxPetLevel = specialLevels.getOrDefault(pet.get("type").getAsString(), 100);
+		int petOffset = rarityOffset.get(pet.get("tier").getAsString());
 		List<Integer> petLevels = levels.subList(petOffset, petOffset + maxPetLevel - 1);
 
 		int level = 1;

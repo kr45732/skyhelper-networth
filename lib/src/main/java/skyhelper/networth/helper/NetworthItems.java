@@ -76,7 +76,7 @@ public class NetworthItems {
 			}
 		}
 
-		// Parse pets
+		// Parse Pets
 		items.put("pets", new ArrayList<>());
 		if (profileData.has("pets")) {
 			items

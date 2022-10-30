@@ -18,24 +18,18 @@ public class PetCalculator {
 		int petLevel = pet.get("level").getAsInt();
 
 		String tierName = (petTier + "_" + petType).toLowerCase();
-		double lvl1 = skyHelperNetworth
-			.getPrices()
-			.getOrDefault(
-				("lvl_1_" + tierName + (petSkin != null ? "_skinned_$" + petSkin : "")).toLowerCase(),
-				skyHelperNetworth.getPrices().getOrDefault("lvl_1_" + tierName, 0.0)
-			);
-		double lvl100 = skyHelperNetworth
-			.getPrices()
-			.getOrDefault(
-				("lvl_100_" + tierName + (petSkin != null ? "_skinned_$" + petSkin : "")).toLowerCase(),
-				skyHelperNetworth.getPrices().getOrDefault("lvl_100_" + tierName, 0.0)
-			);
-		double lvl200 = skyHelperNetworth
-			.getPrices()
-			.getOrDefault(
-				("lvl_200_" + tierName + (petSkin != null ? "_skinned_$" + petSkin : "")).toLowerCase(),
-				skyHelperNetworth.getPrices().getOrDefault("lvl_200_" + tierName, 0.0)
-			);
+		double lvl1 = skyHelperNetworth.prices.getOrDefault(
+			("lvl_1_" + tierName + (petSkin != null ? "_skinned_$" + petSkin : "")).toLowerCase(),
+			skyHelperNetworth.prices.getOrDefault("lvl_1_" + tierName, 0.0)
+		);
+		double lvl100 = skyHelperNetworth.prices.getOrDefault(
+			("lvl_100_" + tierName + (petSkin != null ? "_skinned_$" + petSkin : "")).toLowerCase(),
+			skyHelperNetworth.prices.getOrDefault("lvl_100_" + tierName, 0.0)
+		);
+		double lvl200 = skyHelperNetworth.prices.getOrDefault(
+			("lvl_200_" + tierName + (petSkin != null ? "_skinned_$" + petSkin : "")).toLowerCase(),
+			skyHelperNetworth.prices.getOrDefault("lvl_200_" + tierName, 0.0)
+		);
 
 		String petName = "[Lvl " + petLevel + "] " + Functions.titleCase(petTier + " " + petType) + (petSkin != null ? " ✦" : "");
 		if (lvl1 == 0 || lvl100 == 0) {
@@ -77,7 +71,7 @@ public class PetCalculator {
 			NetworthData.CalculationData calculationData = new NetworthData.CalculationData(
 				heldItem,
 				"pet_item",
-				skyHelperNetworth.getPrices().getOrDefault(heldItem.toLowerCase(), 0.0) * ApplicationWorth.applicationWorth.get("petItem"),
+				skyHelperNetworth.prices.getOrDefault(heldItem.toLowerCase(), 0.0) * ApplicationWorth.applicationWorth.get("petItem"),
 				1
 			);
 			price += calculationData.price();

@@ -99,12 +99,12 @@ public record NetworthData(
 
 		public ItemData(
 			String name,
-			double price,
-			List<CalculationData> calculation,
-			boolean soulbound,
 			String id,
+			double price,
+			double base,
+			List<CalculationData> calculation,
 			int count,
-			double base
+			boolean soulbound
 		) {
 			super(name, price, calculation, soulbound);
 			this.id = id;
