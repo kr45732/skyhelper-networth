@@ -27,7 +27,7 @@ public class SkyHelperNetworth {
 
 	public SkyHelperNetworth() throws IOException {
 		this.httpClient = HttpClient.newHttpClient();
-		try (FileReader reader = new FileReader("lib/src/main/java/skyhelper/networth/calculator/SacksCalculator.java")) {
+		try (FileReader reader = new FileReader("lib/src/main/java/skyhelper/networth/constants/items.json")) {
 			this.skyblockItems = JsonParser.parseReader(reader).getAsJsonArray();
 		}
 	}
