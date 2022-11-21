@@ -4,14 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import me.nullicorn.nedit.type.NBTCompound;
@@ -21,31 +16,33 @@ import skyhelper.networth.helper.NetworthItems;
 
 public class SkyHelperNetworth {
 
-	private final HttpClient httpClient;
-	public final JsonArray skyblockItems;
-	public Map<String, Double> prices = new HashMap<>();
+	private static JsonArray skyblockItems;
 
-	public SkyHelperNetworth() throws IOException {
-		this.httpClient = HttpClient.newHttpClient();
-		try (FileReader reader = new FileReader("lib/src/main/java/skyhelper/networth/constants/items.json")) {
-			this.skyblockItems = JsonParser.parseReader(reader).getAsJsonArray();
+	public static JsonArray getSkyblockItems() throws NetworthException {
+		if (skyblockItems == null) {
+			try (FileReader reader = new FileReader("src/main/resources/items.json")) {
+				skyblockItems = JsonParser.parseReader(reader).getAsJsonArray();
+			} catch (Exception e) {
+				throw new NetworthException("Unable to locate or parse items.json", e);
+			}
 		}
+		return skyblockItems;
 	}
 
 	public NetworthData getNetworth(JsonObject profileData, double bankBalance, boolean onlyNetworth, Map<String, Double> prices)
 		throws NetworthException {
-		double purse = profileData.get("coin_purse").getAsDouble();
-		this.prices = parsePrices(prices);
+		double purse = profileData.has("coin_purse") ? profileData.get("coin_purse").getAsDouble() : 0;
+		prices = parsePrices(prices);
 		NetworthItems items = new NetworthItems(profileData);
-		return NetworthData.calculateNetworth(items, purse, bankBalance, this, onlyNetworth);
+		return NetworthData.calculateNetworth(items, purse, bankBalance, prices, onlyNetworth);
 	}
 
 	public NetworthData.BaseItemData getItemNetworth(Object item, Map<String, Double> prices) throws NetworthException {
 		if (!((item instanceof NBTCompound nbt && nbt.containsKey("tag")) || (item instanceof JsonObject petJson && petJson.has("exp")))) {
 			throw new NetworthException("Invalid item provided");
 		}
-		this.prices = parsePrices(prices);
-		return NetworthData.calculateItemNetworth(item, this);
+		prices = parsePrices(prices);
+		return NetworthData.calculateItemNetworth(item, prices);
 	}
 
 	private Map<String, Double> parsePrices(Map<String, Double> prices) throws NetworthException {
@@ -64,20 +61,20 @@ public class SkyHelperNetworth {
 	}
 
 	private Map<String, Double> getPrices() throws NetworthException {
-		try {
-			HttpRequest httpRequest = HttpRequest
-				.newBuilder(URI.create("https://raw.githubusercontent.com/SkyHelperBot/Prices/main/prices.json"))
-				.GET()
-				.build();
-			HttpResponse<InputStream> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
-			try (InputStream in = httpResponse.body(); InputStreamReader reader = new InputStreamReader(in)) {
-				return JsonParser
-					.parseReader(reader)
-					.getAsJsonObject()
-					.entrySet()
-					.stream()
-					.collect(Collectors.toMap(e -> e.getKey().toLowerCase(), e -> e.getValue().getAsDouble()));
-			}
+		try (
+			InputStream in = URI
+				.create("https://raw.githubusercontent.com/SkyHelperBot/Prices/main/prices.json")
+				.toURL()
+				.openConnection()
+				.getInputStream();
+			InputStreamReader reader = new InputStreamReader(in)
+		) {
+			return JsonParser
+				.parseReader(reader)
+				.getAsJsonObject()
+				.entrySet()
+				.stream()
+				.collect(Collectors.toMap(e -> e.getKey().toLowerCase(), e -> e.getValue().getAsDouble()));
 		} catch (Exception e) {
 			throw new NetworthException("Failed to retrieve prices", e);
 		}

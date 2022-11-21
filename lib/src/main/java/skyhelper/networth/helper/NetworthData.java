@@ -6,7 +6,6 @@ import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import me.nullicorn.nedit.type.NBTCompound;
-import skyhelper.networth.SkyHelperNetworth;
 import skyhelper.networth.calculator.ItemCalculator;
 import skyhelper.networth.calculator.PetCalculator;
 import skyhelper.networth.calculator.SacksCalculator;
@@ -24,9 +23,9 @@ public record NetworthData(
 		NetworthItems items,
 		double purseBalance,
 		double bankBalance,
-		SkyHelperNetworth skyHelperNetworth,
+		Map<String, Double> prices,
 		boolean onlyNetworth
-	) {
+	) throws NetworthException {
 		Map<String, CategoryData> categories = new HashMap<>();
 
 		for (Map.Entry<String, List<Object>> category : items.getItems().entrySet()) {
@@ -37,9 +36,9 @@ public record NetworthData(
 			for (Object item : category.getValue()) {
 				BaseItemData result =
 					switch (category.getKey()) {
-						case "pets" -> PetCalculator.calculatePet((JsonObject) item, skyHelperNetworth);
-						case "sacks" -> SacksCalculator.calculateSackItem((JsonObject) item, skyHelperNetworth);
-						default -> ItemCalculator.calculateItem((NBTCompound) item, skyHelperNetworth);
+						case "pets" -> PetCalculator.calculatePet((JsonObject) item, prices);
+						case "sacks" -> SacksCalculator.calculateSackItem((JsonObject) item, prices);
+						default -> ItemCalculator.calculateItem((NBTCompound) item, prices);
 					};
 
 				if (result != null) {
@@ -80,15 +79,15 @@ public record NetworthData(
 		);
 	}
 
-	public static BaseItemData calculateItemNetworth(Object item, SkyHelperNetworth skyHelperNetworth) {
+	public static BaseItemData calculateItemNetworth(Object item, Map<String, Double> prices) throws NetworthException {
 		boolean isPet = item instanceof JsonObject || ((NBTCompound) item).containsKey("tag.ExtraAttributes.petInfo");
 		if (isPet) {
 			JsonObject petInfo = item instanceof JsonObject petObj
 				? petObj
 				: JsonParser.parseString(((NBTCompound) item).getString("tag.ExtraAttributes.petInfo")).getAsJsonObject();
-			return PetCalculator.calculatePet(Pets.getPetLevel(petInfo), skyHelperNetworth);
+			return PetCalculator.calculatePet(Pets.getPetLevel(petInfo), prices);
 		}
-		return ItemCalculator.calculateItem((NBTCompound) item, skyHelperNetworth);
+		return ItemCalculator.calculateItem((NBTCompound) item, prices);
 	}
 
 	public record CategoryData(double total, double unsoulboundTotal, List<BaseItemData> items) {}

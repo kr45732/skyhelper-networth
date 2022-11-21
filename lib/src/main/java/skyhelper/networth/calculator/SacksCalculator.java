@@ -3,23 +3,26 @@ package skyhelper.networth.calculator;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
+import java.util.Map;
 import skyhelper.networth.SkyHelperNetworth;
 import skyhelper.networth.constants.Misc;
 import skyhelper.networth.helper.NetworthData;
+import skyhelper.networth.helper.NetworthException;
 
 public class SacksCalculator {
 
-	public static NetworthData.SacksItemData calculateSackItem(JsonObject item, SkyHelperNetworth skyHelperNetworth) {
+	public static NetworthData.SacksItemData calculateSackItem(JsonObject item, Map<String, Double> prices) throws NetworthException {
 		String id = item.get("id").getAsString();
 		int amount = item.get("amount").getAsInt();
 
-		double itemPrice = skyHelperNetworth.prices.getOrDefault(id, 0.0);
+		double itemPrice = prices.getOrDefault(id, 0.0);
 		if (id.startsWith("RUNE_") && !Misc.validRunes.contains(id)) {
 			return null;
 		}
 		if (itemPrice > 0) {
 			return new NetworthData.SacksItemData(
-				skyHelperNetworth.skyblockItems
+				SkyHelperNetworth
+					.getSkyblockItems()
 					.asList()
 					.stream()
 					.map(JsonElement::getAsJsonObject)

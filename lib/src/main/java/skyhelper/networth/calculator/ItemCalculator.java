@@ -11,13 +11,14 @@ import skyhelper.networth.SkyHelperNetworth;
 import skyhelper.networth.constants.Pets;
 import skyhelper.networth.helper.Functions;
 import skyhelper.networth.helper.NetworthData;
+import skyhelper.networth.helper.NetworthException;
 
 public class ItemCalculator {
 
-	public static NetworthData.BaseItemData calculateItem(NBTCompound item, SkyHelperNetworth skyHelperNetworth) {
+	public static NetworthData.BaseItemData calculateItem(NBTCompound item, Map<String, Double> prices) throws NetworthException {
 		if (item.getString("tag.ExtraAttributes.id").equals("PET") && item.containsKey("tag.ExtraAttributes.petInfo")) {
 			JsonObject petInfo = JsonParser.parseString(item.getString("tag.ExtraAttributes.petInfo")).getAsJsonObject();
-			return PetCalculator.calculatePet(Pets.getPetLevel(petInfo), skyHelperNetworth);
+			return PetCalculator.calculatePet(Pets.getPetLevel(petInfo), prices);
 		}
 
 		if (item.containsKey("tag.ExtraAttributes.id")) {
@@ -25,7 +26,8 @@ public class ItemCalculator {
 			String itemId = item.getString("tag.ExtraAttributes.id").toLowerCase();
 			NBTCompound extraAttributes = item.getCompound("tag.ExtraAttributes");
 			String finalItemId = itemId; // Lambdas ;-;
-			JsonObject skyblockItem = skyHelperNetworth.skyblockItems
+			JsonObject skyblockItem = SkyHelperNetworth
+				.getSkyblockItems()
 				.asList()
 				.stream()
 				.map(JsonElement::getAsJsonObject)
@@ -69,7 +71,7 @@ public class ItemCalculator {
 				itemId = extraAttributes.getString("id").toLowerCase() + "_" + extraAttributes.getString("party_hat_color");
 			}
 
-			Double itemData = skyHelperNetworth.prices.get(itemId);
+			Double itemData = prices.get(itemId);
 			double price = (itemData != null ? itemData : 0) * item.getInt("Count", 1);
 			double base = (itemData != null ? itemData : 0) * item.getInt("Count", 1);
 			if (price == 0 && extraAttributes.containsKey("price")) {

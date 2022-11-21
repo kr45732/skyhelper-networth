@@ -10,8 +10,11 @@ repositories {
 }
 
 dependencies {
-    // JSON
     implementation 'com.google.code.gson:gson:2.10'
-    // NBT
     implementation 'me.nullicorn:Nedit:2.2.0'
+    testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
+}
+
+test {
+    useJUnitPlatform()
 }

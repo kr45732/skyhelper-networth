@@ -3,7 +3,7 @@ package skyhelper.networth.calculator;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
-import skyhelper.networth.SkyHelperNetworth;
+import java.util.Map;
 import skyhelper.networth.constants.ApplicationWorth;
 import skyhelper.networth.constants.Pets;
 import skyhelper.networth.helper.Functions;
@@ -11,24 +11,24 @@ import skyhelper.networth.helper.NetworthData;
 
 public class PetCalculator {
 
-	public static NetworthData.PetItemData calculatePet(JsonObject pet, SkyHelperNetworth skyHelperNetworth) {
+	public static NetworthData.PetItemData calculatePet(JsonObject pet, Map<String, Double> prices) {
 		String petTier = pet.get("tier").getAsString();
 		String petType = pet.get("type").getAsString();
 		String petSkin = pet.has("skin") ? pet.get("skin").getAsString() : null;
 		int petLevel = pet.get("level").getAsInt();
 
 		String tierName = (petTier + "_" + petType).toLowerCase();
-		double lvl1 = skyHelperNetworth.prices.getOrDefault(
+		double lvl1 = prices.getOrDefault(
 			("lvl_1_" + tierName + (petSkin != null ? "_skinned_$" + petSkin : "")).toLowerCase(),
-			skyHelperNetworth.prices.getOrDefault("lvl_1_" + tierName, 0.0)
+			prices.getOrDefault("lvl_1_" + tierName, 0.0)
 		);
-		double lvl100 = skyHelperNetworth.prices.getOrDefault(
+		double lvl100 = prices.getOrDefault(
 			("lvl_100_" + tierName + (petSkin != null ? "_skinned_$" + petSkin : "")).toLowerCase(),
-			skyHelperNetworth.prices.getOrDefault("lvl_100_" + tierName, 0.0)
+			prices.getOrDefault("lvl_100_" + tierName, 0.0)
 		);
-		double lvl200 = skyHelperNetworth.prices.getOrDefault(
+		double lvl200 = prices.getOrDefault(
 			("lvl_200_" + tierName + (petSkin != null ? "_skinned_$" + petSkin : "")).toLowerCase(),
-			skyHelperNetworth.prices.getOrDefault("lvl_200_" + tierName, 0.0)
+			prices.getOrDefault("lvl_200_" + tierName, 0.0)
 		);
 
 		String petName = "[Lvl " + petLevel + "] " + Functions.titleCase(petTier + " " + petType) + (petSkin != null ? " ✦" : "");
@@ -71,7 +71,7 @@ public class PetCalculator {
 			NetworthData.CalculationData calculationData = new NetworthData.CalculationData(
 				heldItem,
 				"pet_item",
-				skyHelperNetworth.prices.getOrDefault(heldItem.toLowerCase(), 0.0) * ApplicationWorth.applicationWorth.get("petItem"),
+				prices.getOrDefault(heldItem.toLowerCase(), 0.0) * ApplicationWorth.applicationWorth.get("petItem"),
 				1
 			);
 			price += calculationData.price();
